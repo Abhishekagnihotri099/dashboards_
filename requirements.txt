@@ -1,0 +1,6 @@
+streamlit 
+django
+plotly
+streamlit-authenticator
+pyyaml
+djangorestframework
