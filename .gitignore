@@ -1,1 +1,14 @@
 venv/
+# Ignore specific files
+backend/analysis.py
+backend/backend/memcached.py
+backend/backend_app/claimauditable_0.1.csv
+backend/backend_app/claims_0.1.csv
+backend/backend_app/dsoutcome_0.1.csv
+backend/backend_app/parameters_0.1.csv
+backend/backend_app/__pycache__/
+
+# Ignore __pycache__ directories
+backend/backend/__pycache__/
+backend/backend_app/migrations/__pycache__/
+frontend/pages/__pycache__/
