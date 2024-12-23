@@ -19,6 +19,12 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+<<<<<<< HEAD
     path('backend_app/', include('backend_app.urls')),
     path('sds_ai_accuracy/', include('sds_ai_accuracy.urls')),
+=======
+    path('backened/', include('SDS_Home.urls')),
+>>>>>>> 159118ba34caef2f0d7e5221de0eddf56c6c4895
 ]
+
+

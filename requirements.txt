@@ -4,3 +4,4 @@ plotly
 streamlit-authenticator
 pyyaml
 djangorestframework
+streamlit-extras
