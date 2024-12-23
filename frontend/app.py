@@ -1,6 +1,6 @@
 import streamlit as st
 import requests
-
+from pages import FileReview
 # Initialize session state
 if "auth_token" not in st.session_state:
     st.session_state["auth_token"] = None
@@ -42,7 +42,7 @@ def main():
     else:
         # Show navigation menu
         st.sidebar.title("Navigation")
-        page = st.sidebar.radio("Go to", ["Dashboard1", "Dashboard2", "Logout"])
+        page = st.sidebar.radio("Go to", ["Dashboard1", "Dashboard2","File Review" "Logout"])
 
         if page == "Logout":
             logout()
@@ -54,6 +54,8 @@ def main():
         elif page == "Dashboard2":
             st.write("Dashboard 2 content.")
             # Include dashboard logic here
+        elif page == "File Review":
+            FileReview.render_file_review_page()
 
 if __name__ == "__main__":
     main()
