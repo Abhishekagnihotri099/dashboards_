@@ -11,19 +11,41 @@ def render_file_review_page():
         layout="wide"
     )
 
-    # Inject custom CSS for smoother sidebar transitions
+    # Add custom CSS
     st.markdown("""
         <style>
-        .css-1d391kg {
-            transition: margin-left 0.5s ease-in-out;
+        .metric-card {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.2s;
         }
-        .css-1d391kg .css-1v3fvcr {
-            transition: margin-left 0.5s ease-in-out;
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .progress-container {
+            width: 100%;
+            background-color: #f1f1f1;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        .progress-bar {
+            height: 20px;
+            background: linear-gradient(90deg, #4CAF50, #45a049);
+            border-radius: 5px;
+            transition: width 0.5s ease-in-out;
+        }
+        .section-divider {
+            margin: 2rem 0;
+            border-bottom: 1px solid #eee;
         }
         </style>
     """, unsafe_allow_html=True)
 
-    st.title("File Review")
+    st.title("📊 File Review Dashboard")
 
     # Sidebar filters
     st.sidebar.header("Filters")
@@ -98,41 +120,86 @@ def render_file_review_page():
         param_bar_graph_json = data.get('param_bar_graph')
         com_treemap_json = data.get('com_treemap')
 
-        # Display the calculated values in a row
+        # Metrics Section
+        st.subheader("Key Metrics")
         col1, col2, col3, col4 = st.columns(4)
-        col1.metric("Claims Monitored Count", data.get('claims_monitored_count'))
-        col2.metric("Total Opportunities Identified", data.get('total_opportunities_identified'))
-        col3.metric("Total Errors Identified", data.get('total_errors_identified'))
-        col4.metric("File Review Score", data.get('file_review_score'))
+        
+        with col1:
+            st.markdown("""
+                <div class="metric-card">
+                    <h3>Claims Monitored</h3>
+                    <h2>{}</h2>
+                </div>
+            """.format(data.get('claims_monitored_count')), unsafe_allow_html=True)
 
-        if bar_line_graph_json:
-            bar_line_fig = pio.from_json(bar_line_graph_json)
-            st.plotly_chart(bar_line_fig)
+        with col2:
+            st.markdown("""
+                <div class="metric-card">
+                    <h3>Total Opportunities</h3>
+                    <h2>{}</h2>
+                </div>
+            """.format(data.get('total_opportunities_identified')), unsafe_allow_html=True)
 
-        if pie_chart_json:
-            pie_fig = pio.from_json(pie_chart_json)
-            st.plotly_chart(pie_fig)
+        with col3:
+            st.markdown("""
+                <div class="metric-card">
+                    <h3>Total Errors</h3>
+                    <h2>{}</h2>
+                </div>
+            """.format(data.get('total_errors_identified')), unsafe_allow_html=True)
 
-        if treemap_json:
-            treemap_fig = pio.from_json(treemap_json)
-            st.plotly_chart(treemap_fig)
+        with col4:
+            score = data.get('file_review_score', 0)
+            st.markdown(f"""
+                <div class="metric-card">
+                    <h3>File Review Score</h3>
+                    <h2>{score}%</h2>
+                    <div class="progress-container">
+                        <div class="progress-bar" style="width: {score}%"></div>
+                    </div>
+                </div>
+            """, unsafe_allow_html=True)
 
-        if bar_graph_json:
-            bar_fig = pio.from_json(bar_graph_json)
-            st.plotly_chart(bar_fig)
+        st.markdown("<div class='section-divider'></div>", unsafe_allow_html=True)
 
-        if param_bar_graph_json:
-            param_bar_fig = pio.from_json(param_bar_graph_json)
-            st.plotly_chart(param_bar_fig)
+        # Main Charts Section
+        st.subheader("Analysis Overview")
+        with st.spinner('Loading charts...'):
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                if bar_line_graph_json:
+                    st.plotly_chart(pio.from_json(bar_line_graph_json), use_container_width=True)
+                if pie_chart_json:
+                    st.plotly_chart(pio.from_json(pie_chart_json), use_container_width=True)
 
-        if com_treemap_json:
-            com_treemap = pio.from_json(com_treemap_json)
-            st.plotly_chart(com_treemap)
+            with col2:
+                if treemap_json:
+                    st.plotly_chart(pio.from_json(treemap_json), use_container_width=True)
+                if bar_graph_json:
+                    st.plotly_chart(pio.from_json(bar_graph_json), use_container_width=True)
+
+        st.markdown("<div class='section-divider'></div>", unsafe_allow_html=True)
+
+        # Parameter Analysis Section
+        st.subheader("Parameter Analysis")
+        col1, col2 = st.columns(2)
+        with col1:
+            if param_bar_graph_json:
+                st.plotly_chart(pio.from_json(param_bar_graph_json), use_container_width=True)
+        with col2:
+            if com_treemap_json:
+                st.plotly_chart(pio.from_json(com_treemap_json), use_container_width=True)
     else:
         st.write("Error fetching data")
 
-    # Button to apply filters
-    if st.sidebar.button("Apply Filters"):
+    # Sidebar improvements
+    with st.sidebar:
+        st.markdown("### 🔍 Filter Options")
+        # ... existing sidebar code ...
+
+    # Add apply filters button with better styling
+    if st.sidebar.button("Apply Filters", type="primary"):
         params = {
             'line_of_business': line_of_business,
             'subline_of_business': subline_of_business,
@@ -166,36 +233,76 @@ def render_file_review_page():
             param_bar_graph_json = data.get('param_bar_graph')
             com_treemap_json = data.get('com_treemap')
 
-            # Display the calculated values in a row
+            # Metrics Section
+            st.subheader("Key Metrics")
             col1, col2, col3, col4 = st.columns(4)
-            col1.metric("Claims Monitored Count", data.get('claims_monitored_count'))
-            col2.metric("Total Opportunities Identified", data.get('total_opportunities_identified'))
-            col3.metric("Total Errors Identified", data.get('total_errors_identified'))
-            col4.metric("File Review Score", data.get('file_review_score'))
+            
+            with col1:
+                st.markdown("""
+                    <div class="metric-card">
+                        <h3>Claims Monitored</h3>
+                        <h2>{}</h2>
+                    </div>
+                """.format(data.get('claims_monitored_count')), unsafe_allow_html=True)
 
-            if bar_line_graph_json:
-                bar_line_fig = pio.from_json(bar_line_graph_json)
-                st.plotly_chart(bar_line_fig)
+            with col2:
+                st.markdown("""
+                    <div class="metric-card">
+                        <h3>Total Opportunities</h3>
+                        <h2>{}</h2>
+                    </div>
+                """.format(data.get('total_opportunities_identified')), unsafe_allow_html=True)
 
-            if pie_chart_json:
-                pie_fig = pio.from_json(pie_chart_json)
-                st.plotly_chart(pie_fig)
+            with col3:
+                st.markdown("""
+                    <div class="metric-card">
+                        <h3>Total Errors</h3>
+                        <h2>{}</h2>
+                    </div>
+                """.format(data.get('total_errors_identified')), unsafe_allow_html=True)
 
-            if treemap_json:
-                treemap_fig = pio.from_json(treemap_json)
-                st.plotly_chart(treemap_fig)
+            with col4:
+                score = data.get('file_review_score', 0)
+                st.markdown(f"""
+                    <div class="metric-card">
+                        <h3>File Review Score</h3>
+                        <h2>{score}%</h2>
+                        <div class="progress-container">
+                            <div class="progress-bar" style="width: {score}%"></div>
+                        </div>
+                    </div>
+                """, unsafe_allow_html=True)
 
-            if bar_graph_json:
-                bar_fig = pio.from_json(bar_graph_json)
-                st.plotly_chart(bar_fig)
+            st.markdown("<div class='section-divider'></div>", unsafe_allow_html=True)
 
-            if param_bar_graph_json:
-                param_bar_fig = pio.from_json(param_bar_graph_json)
-                st.plotly_chart(param_bar_fig)
+            # Main Charts Section
+            st.subheader("Analysis Overview")
+            with st.spinner('Loading charts...'):
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    if bar_line_graph_json:
+                        st.plotly_chart(pio.from_json(bar_line_graph_json), use_container_width=True)
+                    if pie_chart_json:
+                        st.plotly_chart(pio.from_json(pie_chart_json), use_container_width=True)
 
-            if com_treemap_json:
-                com_treemap = pio.from_json(com_treemap_json)
-                st.plotly_chart(com_treemap)
+                with col2:
+                    if treemap_json:
+                        st.plotly_chart(pio.from_json(treemap_json), use_container_width=True)
+                    if bar_graph_json:
+                        st.plotly_chart(pio.from_json(bar_graph_json), use_container_width=True)
+
+            st.markdown("<div class='section-divider'></div>", unsafe_allow_html=True)
+
+            # Parameter Analysis Section
+            st.subheader("Parameter Analysis")
+            col1, col2 = st.columns(2)
+            with col1:
+                if param_bar_graph_json:
+                    st.plotly_chart(pio.from_json(param_bar_graph_json), use_container_width=True)
+            with col2:
+                if com_treemap_json:
+                    st.plotly_chart(pio.from_json(com_treemap_json), use_container_width=True)
         else:
             st.write("Error fetching data")
 

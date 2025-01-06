@@ -1,0 +1,60 @@
+1st filter :
+
+= Table.SelectRows(vw_powerbi_claimauditable_View, each [AUDIT DATE] >= #date(2024, 1, 18) and [AUDIT DATE] <= #date(2024, 10, 31))
+
+2nd filter : 
+
+= Table.SelectRows(#"Filtered Rows1",each ([PARAMETER ID] = "1" or [PARAMETER ID] = "10" or [PARAMETER ID] = "11" or [PARAMETER ID] = "12" or [PARAMETER ID] = "13" or [PARAMETER ID] = "14" or [PARAMETER ID] = "15" or [PARAMETER ID] = "16" or [PARAMETER ID] = "17" or [PARAMETER ID] = "18" or [PARAMETER ID] = "19" or [PARAMETER ID] = "2" or [PARAMETER ID] = "20" or [PARAMETER ID] = "21" or [PARAMETER ID] = "22" or [PARAMETER ID] = "23" or [PARAMETER ID] = "24" or [PARAMETER ID] = "25" or [PARAMETER ID] = "27" or [PARAMETER ID] = "28" or [PARAMETER ID] = "29" or [PARAMETER ID] = "3" or [PARAMETER ID] = "30" or [PARAMETER ID] = "31" or [PARAMETER ID] = "32" or [PARAMETER ID] = "35" or [PARAMETER ID] = "36" or [PARAMETER ID] = "4" or [PARAMETER ID] = "5" or [PARAMETER ID] = "6" or [PARAMETER ID] = "8" or [PARAMETER ID] = "9" or [PARAMETER ID] = "CP11" or [PARAMETER ID] = "CP12" or [PARAMETER ID] = "CP13" or [PARAMETER ID] = "CP14" or [PARAMETER ID] = "CP15" or [PARAMETER ID] = "CP16" or [PARAMETER ID] = "CP17" or [PARAMETER ID] = "CP2" or [PARAMETER ID] = "CP20" or [PARAMETER ID] = "CP21" or [PARAMETER ID] = "CP22" or [PARAMETER ID] = "CP24" or [PARAMETER ID] = "CP25" or [PARAMETER ID] = "CP26" or [PARAMETER ID] = "CP27" or [PARAMETER ID] = "CP28" or [PARAMETER ID] = "CP3" or [PARAMETER ID] = "CP30" or [PARAMETER ID] = "CP31" or [PARAMETER ID] = "CP32" or [PARAMETER ID] = "CP33" or [PARAMETER ID] = "CP36" or [PARAMETER ID] = "CP43" or [PARAMETER ID] = "CP44" or [PARAMETER ID] = "CP45" or [PARAMETER ID] = "CP46" or [PARAMETER ID] = "CP47" or [PARAMETER ID] = "CP48" or [PARAMETER ID] = "CP6" or [PARAMETER ID] = "CP7" or [PARAMETER ID] = "CP8" or [PARAMETER ID] = "CP9"))
+
+3rd :
+
+
+= Table.SelectRows(#"Filtered Rows2", each ([PARAMETER NAME] <> null))
+
+4th :
+
+= Table.TransformColumnTypes(#"Filtered Rows",{{"AUDIT DATE", type date}, {"PARAMETER NAME", type text}})
+
+5th :
+
+
+= Table.DuplicateColumn(#"Changed Type", "PARAMETER SCORE", "PARAMETER SCORE - Copy")
+
+6th :
+
+= Table.ReplaceValue(#"Duplicated Column",null,"No",Replacer.ReplaceValue,{"PARAMETER SCORE - Copy"})
+
+7th : 
+
+= Table.ReplaceValue(#"Replaced Value1","Not Met","Yes",Replacer.ReplaceText,{"PARAMETER SCORE - Copy"})
+
+8th :   
+
+= Table.ReplaceValue(#"Replaced Value2","Met","Yes",Replacer.ReplaceText,{"PARAMETER SCORE - Copy"})
+
+9th:
+
+= Table.ReplaceValue(#"Replaced Value3","Not Applicable","NA",Replacer.ReplaceText,{"PARAMETER SCORE AI"})
+
+
+10th:
+
+= Table.AddColumn(#"Replaced Value4", "PID", each "P"& [PARAMETER ID])
+11th:
+
+
+= Table.ReplaceValue(#"Added PID","PCP","CP",Replacer.ReplaceText,{"PID"})
+
+
+12th :
+
+
+= Table.AddColumn(#"Replaced Value5", "PID&NAME", each [PID]&" "&[PARAMETER NAME])
+
+
+13th :
+
+
+= Table.RenameColumns(#"Added Custom",{{"PARAMETER SCORE - Copy", "MANUAL REVIEW"}})
+
+

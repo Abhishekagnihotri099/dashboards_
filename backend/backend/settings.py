@@ -37,13 +37,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-<<<<<<< HEAD
     'backend_app',
-    'sds_ai_accuracy'
-=======
-    'SDS_Home',
-    'rest_framework'
->>>>>>> 159118ba34caef2f0d7e5221de0eddf56c6c4895
+    'sds_ai_accuracy',
+    'sds_ai_coverage'
 ]
 
 MIDDLEWARE = [
