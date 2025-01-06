@@ -18,3 +18,4 @@ backend/backend_app/migrations/__pycache__/
 frontend/pages/__pycache__/
 backend/db.sqlite3
 backend/backend_app/views_old.pybackend/db.sqlite3
+backend/db.sqlite3
