@@ -1,6 +1,5 @@
 import streamlit as st
 import requests
-import plotly.graph_objects as go
 import plotly.io as pio
 from datetime import datetime
 
@@ -8,44 +7,145 @@ def render_file_review_page():
     st.set_page_config(
         page_title="File Review",
         page_icon="📄",
-        layout="wide"
+        layout="wide",
+        initial_sidebar_state="expanded"
     )
 
-    # Add custom CSS
+    # Add these CSS rules to the existing style block
     st.markdown("""
         <style>
+        /* Remove top padding and white space */
+        .main > div {
+            padding-top: 0rem;
+        }
+        
+        /* Remove default header margin */
+        .stApp header {
+            background: none;
+        }
+        
+        /* Adjust container spacing */
+        .block-container {
+            padding-top: 1rem;
+            padding-bottom: 0rem;
+            max-width: 100%;
+        }
+        
+        /* Existing CSS rules... */
+        :root {
+            --primary-color: #0078D4;
+            --secondary-color: #005A9E;
+            --background-color: #F5F5F5;
+            --card-background: #FFFFFF;
+            --text-primary: #252525;
+            --text-secondary: #666666;
+        }
+        
+        /* Global styles */
+        .stApp {
+            background-color: var(--background-color);
+        }
+        
+        /* Header */
+        h1, h2, h3 {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+        
+        /* Metric cards */
         .metric-card {
-            background: #ffffff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            text-align: center;
-            transition: transform 0.2s;
+            background: var(--card-background);
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            transition: transform 0.2s ease;
+            height: 160px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
+        
         .metric-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
+        
+        .metric-title {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+        }
+        
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        /* Progress bar */
         .progress-container {
             width: 100%;
-            background-color: #f1f1f1;
-            border-radius: 5px;
-            margin-top: 10px;
+            background-color: #E5E5E5;
+            border-radius: 4px;
+            margin-top: 0.5rem;
+            overflow: hidden;
         }
+        
         .progress-bar {
-            height: 20px;
-            background: linear-gradient(90deg, #4CAF50, #45a049);
-            border-radius: 5px;
+            height: 6px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            border-radius: 4px;
             transition: width 0.5s ease-in-out;
         }
+        
+        /* Chart containers */
+        .chart-container {
+            background: var(--card-background);
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            margin: 1rem 0;
+            transition: transform 0.2s ease;
+        }
+
+        .chart-container:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        /* Sidebar */
+        .css-1d391kg {
+            background-color: var(--card-background);
+            padding: 1rem;
+        }
+        
+        /* Section dividers */
         .section-divider {
             margin: 2rem 0;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid #E5E5E5;
+        }
+        
+        /* Loading spinner */
+        .stSpinner {
+            border-color: var(--primary-color);
+        }
+
+        /* Add section title styling */
+        h2 {
+            margin: 2rem 0 1rem 0;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            font-size: 1.5rem;
         }
         </style>
     """, unsafe_allow_html=True)
 
-    st.title("📊 File Review Dashboard")
+    # PowerBI-like header
+    st.markdown("<h1 style='color: var(--primary-color); margin-bottom: 2rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--primary-color);'>📄 File Review Dashboard</h1>", unsafe_allow_html=True)
 
     # Sidebar filters
     st.sidebar.header("Filters")
@@ -111,85 +211,83 @@ def render_file_review_page():
     # Fetch data with default filters when the app starts
     response = requests.get("http://localhost:8000/backend_app/generate_graphs", params=default_params)
     
+    # Modern metrics display
     if response.status_code == 200:
         data = response.json()
-        bar_line_graph_json = data.get('bar_line_graph')
-        pie_chart_json = data.get('pie_chart')
-        treemap_json = data.get('treemap')
-        bar_graph_json = data.get('bar_graph')
-        param_bar_graph_json = data.get('param_bar_graph')
-        com_treemap_json = data.get('com_treemap')
-
-        # Metrics Section
-        st.subheader("Key Metrics")
-        col1, col2, col3, col4 = st.columns(4)
         
-        with col1:
-            st.markdown("""
-                <div class="metric-card">
-                    <h3>Claims Monitored</h3>
-                    <h2>{}</h2>
-                </div>
-            """.format(data.get('claims_monitored_count')), unsafe_allow_html=True)
+        # Metrics row with consistent sizing
+        col1, col2, col3, col4 = st.columns(4)
+        metrics = [
+            ("Claims Monitored", data.get('claims_monitored_count')),
+            ("Total Opportunities", data.get('total_opportunities_identified')),
+            ("Total Errors", data.get('total_errors_identified')),
+            ("File Review Score", f"{data.get('file_review_score', 0)}%")
+        ]
 
-        with col2:
-            st.markdown("""
-                <div class="metric-card">
-                    <h3>Total Opportunities</h3>
-                    <h2>{}</h2>
-                </div>
-            """.format(data.get('total_opportunities_identified')), unsafe_allow_html=True)
-
-        with col3:
-            st.markdown("""
-                <div class="metric-card">
-                    <h3>Total Errors</h3>
-                    <h2>{}</h2>
-                </div>
-            """.format(data.get('total_errors_identified')), unsafe_allow_html=True)
-
-        with col4:
-            score = data.get('file_review_score', 0)
-            st.markdown(f"""
-                <div class="metric-card">
-                    <h3>File Review Score</h3>
-                    <h2>{score}%</h2>
-                    <div class="progress-container">
-                        <div class="progress-bar" style="width: {score}%"></div>
+        for col, (label, value) in zip([col1, col2, col3, col4], metrics):
+            with col:
+                st.markdown(f"""
+                    <div class="metric-card">
+                        <div class="metric-title">{label}</div>
+                        <div class="metric-value">{value}</div>
+                        {f'''<div class="progress-container">
+                            <div class="progress-bar" style="width: {value.replace('%', '')}%"></div>
+                        </div>''' if '%' in str(value) else ''}
                     </div>
-                </div>
-            """, unsafe_allow_html=True)
+                """, unsafe_allow_html=True)
 
+        # Chart sections with consistent styling
         st.markdown("<div class='section-divider'></div>", unsafe_allow_html=True)
+        
+        # Analysis Overview section
+        st.markdown("<div class='section-divider'></div>", unsafe_allow_html=True)
+        st.markdown("<h2>Analysis Overview</h2>", unsafe_allow_html=True)
 
-        # Main Charts Section
-        st.subheader("Analysis Overview")
-        with st.spinner('Loading charts...'):
-            col1, col2 = st.columns(2)
+        with st.spinner('Loading analysis...'):
+            # Graph 1
+            if data.get('bar_line_graph'):
+                st.markdown("<div class='chart-container'>", unsafe_allow_html=True)
+                st.plotly_chart(pio.from_json(data.get('bar_line_graph')), 
+                               use_container_width=True, 
+                               theme="streamlit")
+                st.markdown("</div>", unsafe_allow_html=True)
             
-            with col1:
-                if bar_line_graph_json:
-                    st.plotly_chart(pio.from_json(bar_line_graph_json), use_container_width=True)
-                if pie_chart_json:
-                    st.plotly_chart(pio.from_json(pie_chart_json), use_container_width=True)
+            # Graph 2
+            if data.get('pie_chart'):
+                st.markdown("<div class='chart-container'>", unsafe_allow_html=True)
+                st.plotly_chart(pio.from_json(data.get('pie_chart')), 
+                               use_container_width=True, 
+                               theme="streamlit")
+                st.markdown("</div>", unsafe_allow_html=True)
+            
+            # Graph 3
+            if data.get('treemap'):
+                st.markdown("<div class='chart-container'>", unsafe_allow_html=True)
+                st.plotly_chart(pio.from_json(data.get('treemap')), 
+                               use_container_width=True, 
+                               theme="streamlit")
+                st.markdown("</div>", unsafe_allow_html=True)
+            
+            # Graph 4
+            if data.get('bar_graph'):
+                st.markdown("<div class='chart-container'>", unsafe_allow_html=True)
+                st.plotly_chart(pio.from_json(data.get('bar_graph')), 
+                               use_container_width=True, 
+                               theme="streamlit")
+                st.markdown("</div>", unsafe_allow_html=True)
 
-            with col2:
-                if treemap_json:
-                    st.plotly_chart(pio.from_json(treemap_json), use_container_width=True)
-                if bar_graph_json:
-                    st.plotly_chart(pio.from_json(bar_graph_json), use_container_width=True)
-
+        # Parameter Analysis section
         st.markdown("<div class='section-divider'></div>", unsafe_allow_html=True)
-
-        # Parameter Analysis Section
-        st.subheader("Parameter Analysis")
+        st.markdown("<h2>Parameter Analysis</h2>", unsafe_allow_html=True)
+        
         col1, col2 = st.columns(2)
-        with col1:
-            if param_bar_graph_json:
-                st.plotly_chart(pio.from_json(param_bar_graph_json), use_container_width=True)
-        with col2:
-            if com_treemap_json:
-                st.plotly_chart(pio.from_json(com_treemap_json), use_container_width=True)
+        for col, chart in [(col1, data.get('param_bar_graph')), (col2, data.get('com_treemap'))]:
+            with col:
+                if chart:
+                    with st.container():
+                        st.markdown("<div class='chart-container'>", unsafe_allow_html=True)
+                        st.plotly_chart(pio.from_json(chart), use_container_width=True, theme="streamlit")
+                        st.markdown("</div>", unsafe_allow_html=True)
     else:
         st.write("Error fetching data")
 
