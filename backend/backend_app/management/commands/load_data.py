@@ -7,8 +7,12 @@ from django.utils.dateparse import parse_datetime
 
 class Command(BaseCommand):
     help = 'Load data from dsoutcome_0.2.csv into the Audit model'
+    # Delete previous data
+    
 
     def handle(self, *args, **kwargs):
+        dsoutcome.objects.all().delete()
+        print("All data deleted for DSoutcome")
         csv_file_path = 'backend_app/dsoutcome_0.2.csv'
         with open(csv_file_path, newline='', encoding='utf-8') as csvfile:
             reader = csv.DictReader(csvfile)

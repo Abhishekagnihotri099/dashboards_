@@ -22,6 +22,8 @@ urlpatterns = [
     path('backend_app/', include('backend_app.urls')),
     path('sds_ai_accuracy/', include('sds_ai_accuracy.urls')),
     path('sds_ai_coverage/', include('sds_ai_coverage.urls')),
+    path('SDS_Home/', include('SDS_Home.urls')),
+    path('sds_signal_summary/', include('sds_signal_summary.urls')),
 ]
 
 
