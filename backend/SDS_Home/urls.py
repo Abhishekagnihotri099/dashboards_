@@ -1,7 +1,9 @@
 from django.urls import path
-from .views import get_leakage_data, get_file_review_data
+from .views import filter_data_home_page1, filter_data_home_page2
 
 urlpatterns = [
-    path('api/filtered-data-leakage/', get_leakage_data, name='filtered_data'),
-    path('api/filtered-data-filereview/', get_file_review_data, name='filtered_data'),
+    path('filter_data_home_page1/', filter_data_home_page1, name='filter_data_home_page1'),
+    path('filter_data_home_page2/', filter_data_home_page2, name='filter_data_home_page2'),
+
+
 ]

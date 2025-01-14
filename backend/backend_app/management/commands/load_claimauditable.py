@@ -24,13 +24,16 @@ class Command(BaseCommand):
 
         # Delete previous data
         ClaimAuditable.objects.all().delete()
+        # dsoutcome.objects.all().delete()
+        print("All data deleted for DSoutcome")
         self.stdout.write(self.style.WARNING('Deleted previous data from ClaimAuditable model'))
 
         # Get all claims for random selection
         all_claims = list(Claims.objects.all())
-
+        # csv_file = 'backend_app/claimauditable_0.1.csv'
         with open(csv_file, newline='', encoding='utf-8') as file:
             reader = csv.DictReader(file)
+            print("CSV Headers:", reader.fieldnames)
             for row in reader:
                 try:
                     claim = Claims.objects.get(claim_id=row['claim_id'])
