@@ -8,8 +8,7 @@ class ClaimAuditableAdmin(admin.ModelAdmin):
     list_display = ('claim','parameter_score_ai','total', 'met' , 'accuracy_denominator' , 'accuracy_numerator')
 
 class dsoutcomeAdmin(admin.ModelAdmin):
-    list_display = ('parameter_id','leakage_category')
-
+    list_display = ('parameter_id','leakage_category','potential_leakage_amount','stored_ds_paid_remaining', 'leakage_rate_max_sub_measure')
 
 admin.site.register(Claims)
 

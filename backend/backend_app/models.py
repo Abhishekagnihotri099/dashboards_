@@ -1,4 +1,8 @@
 from django.db import models
+from django.db.models import Max, F
+from django.db.models.functions import Coalesce
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
 
 
 class Claims(models.Model):
@@ -181,6 +185,45 @@ class dsoutcome(models.Model):
     use_case = models.CharField(max_length=100, null=True)
     week_begin = models.DateTimeField(null=True)
     lob = models.CharField(max_length=100, null=True)
+    
+     # Field to store the calculated value in the database
+    # finalized_leakage_amount = models.FloatField(null=True, blank=True)
+    stored_ds_paid_remaining = models.FloatField(null=True, blank=True)
+    stored_final_leakage = models.FloatField(null=True, blank=True) 
+    stored_leakage_rate = models.FloatField(null=True, blank=True)
+
+    @property
+    def ds_paid_remaining(self):
+        if self.stored_ds_paid_remaining is not None:
+            return self.stored_ds_paid_remaining
+        X = self.claim.paid_amount or 0
+        Y = self.claim.remaining_reserve or 0
+        Z = self.claim.total_recovery or 0
+        d = (X or 0) + (Y or 0) - (Z or 0)
+        return d
+   
+    @property
+    def get_final_leakage(self):
+        if self.stored_final_leakage is not None:
+            return self.stored_final_leakage
+        if self.leakage_level == "No Leakage":
+            return 0
+        if self.manual_leakage_amount is None or self.manual_leakage_amount == 0.0:
+            return self.potential_leakage_amount or 0
+        return self.manual_leakage_amount
+
+    @property 
+    def leakage_rate_max_sub_measure(self):
+        if self.stored_leakage_rate is not None:
+            return self.stored_leakage_rate
+        parameter_id = self.parameter.parameter_id
+        related_outcomes = dsoutcome.objects.filter(
+            parameter_id=parameter_id
+        )
+        max_leakage = related_outcomes.values('claim_id').annotate(
+            max_amount=Coalesce(Max(F('stored_final_leakage')), 0.0)
+        )
+        return sum(item['max_amount'] for item in max_leakage)
 
     @property
     def leakage_category(self):
@@ -211,6 +254,13 @@ class dsoutcome(models.Model):
 
     def __str__(self):
         return self.audit_id
+
+@receiver(pre_save, sender=dsoutcome)
+def calculate_and_store_values(sender, instance, **kwargs):
+    """Calculate and store values before saving"""
+    instance.stored_ds_paid_remaining = instance.ds_paid_remaining
+    instance.stored_final_leakage = instance.get_final_leakage
+    instance.stored_leakage_rate = instance.leakage_rate_max_sub_measure
     
 class LOB(models.Model):
     lob = models.CharField(max_length=100, primary_key=True)
