@@ -19,3 +19,8 @@ frontend/pages/__pycache__/
 backend/db.sqlite3
 backend/backend_app/views_old.pybackend/db.sqlite3
 backend/db.sqlite3
+
+backend/backend_app/migrations/
+backend/backend/__pycache__/
+backend/sds_ai_coverage/__pycache__/
+backend/backend_app/management/commands/__pycache__/
