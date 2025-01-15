@@ -30,3 +30,5 @@ backend/sds_ai_accuracy/migrations/
 backend/backend/__pycache__/
 backend/sds_ai_coverage/__pycache__/
 backend/sds_ai_coverage/migrations/
+backend\sds_claim_leakage\__pycache__
+backend\sds_claim_leakage\migrations
