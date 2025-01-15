@@ -1,0 +1,19 @@
+project/
+├── frontend/                  # Streamlit frontend
+│   ├── app.py                 # Main Streamlit app
+│   ├── pages/                 # Dashboard pages
+│   │   ├── dashboard1.py
+│   │   ├── dashboard2.py
+│   │   └── dashboard3.py
+│   ├── utils/                 # Helper functions for Streamlit
+│   └── requirements.txt       # Dependencies for Streamlit
+├── backend/                   # Django backend
+│   ├── manage.py              # Django management script
+│   ├── backend_app/           # Main Django app
+│   │   ├── views.py           # Handles backend logic
+│   │   ├── urls.py            # Django URL routing
+│   │   └── models.py          # Database models
+│   ├── settings.py            # Django project settings
+│   ├── urls.py                # Project-wide URL configuration
+│   └── wsgi.py                # WSGI entry point
+└── requirements.txt           # Combined dependencies
