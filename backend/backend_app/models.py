@@ -240,6 +240,7 @@ class dsoutcome(models.Model):
     stored_sequence_column = models.IntegerField(null=True, blank=True)
     stored_signal_close_date2 = models.DateTimeField(null=True, blank=True)
     stored_exclusions = models.IntegerField(null=True, blank=True)
+    stored_leakage_category = models.CharField(max_length=100, null=True, blank=True)
 
     @property
     def MatchinorNot(self):
@@ -451,6 +452,7 @@ def calculate_and_store_values(sender, instance, **kwargs):
     instance.stored_sequence_column = instance.sequence_column
     instance.stored_signal_close_date2 = instance.signal_close_date_
     instance.stored_exclusions = instance.exclusions
+    instance.stored_leakage_category = instance.leakage_category
 
     
 

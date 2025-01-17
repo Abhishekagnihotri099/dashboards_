@@ -24,6 +24,7 @@ urlpatterns = [
     path('sds_ai_coverage/', include('sds_ai_coverage.urls')),
     path('SDS_Home/', include('SDS_Home.urls')),
     path('sds_signal_summary/', include('sds_signal_summary.urls')),
+    path('sds_compliance_review/', include('sds_compliance_review.urls'))
 ]
 
 

@@ -4,10 +4,9 @@ import requests
 import plotly.express as px
 import plotly.io as pio
 
-
 def render_home_page():
     st.set_page_config(page_title="Homepage", page_icon="🌟", layout="wide")
-     # Add these CSS rules to the existing style block
+    # Add these CSS rules to the existing style block
     st.markdown("""
         <style>
         /* Remove top padding and white space */
@@ -143,31 +142,36 @@ def render_home_page():
     # PowerBI-like header
     st.markdown("<h1 style='color: var(--primary-color); margin-bottom: 2rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--primary-color);'>Home</h1>", unsafe_allow_html=True)
 
-    # st.title("Home")
+    # Radio options for selection on the main page
+    radio_opt = ["Leakage Rate Trend %", "File Review Score Trend %"]
+    selected_opt = st.radio(label="Choose the view", options=radio_opt)
 
     # Streamlit Sidebar for Filter Options
     st.sidebar.header("Filter Options")
 
-    # Radio options for selection
-    radio_opt = ["Leakage Rate Trend %", "File Review Score Trend %"]
-    selected_opt = st.radio(label="Choose the view", options=radio_opt)
-
-    if radio_opt.index(selected_opt)==0:
-        date_range = st.sidebar.date_input("Monitoring Date (Leakage)", [pd.to_datetime('2024-01-01'), pd.to_datetime('2024-12-31')], key='date_range')
-        start_date, end_date = date_range[0], date_range[1]
+    if selected_opt == "Leakage Rate Trend %":
+        date_range = st.sidebar.date_input("Monitoring Date (Leakage)", [pd.to_datetime('2024-01-01'), pd.to_datetime('2024-12-31')], key='date_range_leakage')
         line_of_business_options = ['All', 'Motor', 'Property', 'Travel', 'Casulty']
         line_of_business = st.sidebar.multiselect('Line of Business (Leakage)', options=line_of_business_options, default=['All'])
 
+        # Add a selectbox for date hierarchy on the main page
+        date_hierarchy = st.selectbox(
+            "Select Date Hierarchy",
+            ["Day-wise", "Month-wise", "Quarterly", "Yearly"]
+        )
+
         if 'All' in line_of_business:
             line_of_business = line_of_business_options[1:]
+
         # Define API endpoint for filtered data
         API_URL = "http://localhost:8000/SDS_Home/filter_data_home_page1"
 
         # Fetch filtered data from Django API
         params = {
-            'start_date': start_date.strftime('%Y-%m-%d'),
-            'end_date': end_date.strftime('%Y-%m-%d'),
-            'line_of_business': line_of_business
+            'start_date': date_range[0].strftime('%Y-%m-%d'),
+            'end_date': date_range[1].strftime('%Y-%m-%d'),
+            'line_of_business': line_of_business,
+            'date_hierarchy': date_hierarchy
         }
 
         response = requests.get(API_URL, params=params)
@@ -179,11 +183,16 @@ def render_home_page():
         else:
             st.error("Failed to fetch data from the API.")
 
-    elif radio_opt.index(selected_opt)==1:
-        date_range = st.sidebar.date_input("Monitoring Date (File Review)", [pd.to_datetime('2024-01-01'), pd.to_datetime('2024-12-31')], key='date_range')
-        start_date, end_date = date_range[0], date_range[1]
+    elif selected_opt == "File Review Score Trend %":
+        date_range = st.sidebar.date_input("Monitoring Date (File Review)", [pd.to_datetime('2024-01-01'), pd.to_datetime('2024-12-31')], key='date_range_file_review')
         line_of_business_options = ['All', 'Motor', 'Property', 'Travel', 'Casulty']
         line_of_business = st.sidebar.multiselect('Line of Business (File Review)', options=line_of_business_options, default=['All'])
+
+        # Add a selectbox for date hierarchy on the main page
+        date_hierarchy = st.selectbox(
+            "Select Date Hierarchy",
+            ["Day-wise", "Month-wise", "Quarterly", "Yearly"]
+        )
 
         if 'All' in line_of_business:
             line_of_business = line_of_business_options[1:]
@@ -192,9 +201,10 @@ def render_home_page():
 
         # Fetch filtered data from Django API
         params = {
-            'start_date': start_date.strftime('%Y-%m-%d'),
-            'end_date': end_date.strftime('%Y-%m-%d'),
-            'line_of_business': line_of_business
+            'start_date': date_range[0].strftime('%Y-%m-%d'),
+            'end_date': date_range[1].strftime('%Y-%m-%d'),
+            'line_of_business': line_of_business,
+            'date_hierarchy': date_hierarchy
         }
 
         response = requests.get(API_URL, params=params)
@@ -207,3 +217,5 @@ def render_home_page():
             st.error("Failed to fetch data from the API.")
 
 render_home_page()
+
+
